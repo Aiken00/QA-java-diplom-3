@@ -1,0 +1,14 @@
+pageobjects\MainPage.class
+pageobjects\ForgotPasswordPage.class
+handlers\WebDriverFactory.class
+praktikum\AuthTests.class
+handlers\User.class
+pageobjects\RegisterPage.class
+praktikum\RegisterPageTests.class
+praktikum\MainPageTests.class
+handlers\Parameters.class
+pageobjects\AuthPage.class
+handlers\UserResponsed.class
+praktikum\ProfilePageTests.class
+handlers\ApiClient.class
+pageobjects\ProfilePage.class
