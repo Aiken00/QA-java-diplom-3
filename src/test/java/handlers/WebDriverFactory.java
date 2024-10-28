@@ -31,7 +31,7 @@ public class WebDriverFactory {
         switch (browserName.toLowerCase()) {
             case "chrome":
                 ChromeOptions chromeOptions = new ChromeOptions();
-                chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage");
+                chromeOptions.addArguments("--no-sandbox", "--disable-dev-shm-usage","--headless");
                 WebDriverManager.chromedriver().setup();
                 return new ChromeDriver(chromeOptions);
 

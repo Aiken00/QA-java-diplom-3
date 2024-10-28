@@ -38,7 +38,6 @@ AuthTests {
         WebDriverFactory webDriverFactory = new WebDriverFactory();
         webDriver = webDriverFactory.getWebDriver();
         webDriver.get(Parameters.URL_MAIN_PAGE);
-        Thread.sleep(10000);
 
         authPage = new AuthPage(webDriver);
         mainPage = new MainPage(webDriver);
