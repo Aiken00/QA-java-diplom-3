@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: praktikum.MainPageTests
+-------------------------------------------------------------------------------
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 25.104 s - in praktikum.MainPageTests

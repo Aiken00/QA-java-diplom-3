@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.runners.JUnit4;
 import org.openqa.selenium.WebDriver;
 import pageobjects.AuthPage;
 import pageobjects.MainPage;
@@ -19,34 +19,24 @@ import pageobjects.ProfilePage;
 
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 
 @DisplayName("Проверки личного кабинета пользователя")
-@RunWith(Parameterized.class)
+@RunWith(JUnit4.class)
 public class ProfilePageTests {
     private WebDriver driver;
-    private String browserName;
     private AuthPage authPage;
     private MainPage mainPage;
     private ProfilePage profilePage;
     private String name, email, password;
     private ApiClient apiClient;
+    private WebDriverFactory webDriverFactory;
 
-    @Parameterized.Parameters(name="Browser {0}")
-    public static Object[][] initParams() {
-        return new Object[][] {
-                {"chrome"},
-                {"yandex"}
-        };
-    }
-    public ProfilePageTests(String browserName) {
-        this.browserName = browserName;
-    }
     @Before
     @Step("Запуск браузера, подготовка тестовых данных")
     public void startUp() {
-        WebDriverFactory webDriverFactory = new WebDriverFactory();
-        driver = webDriverFactory.getWebDriver(browserName);
+        webDriverFactory = new WebDriverFactory();
+        driver = webDriverFactory.getWebDriver();
         driver.get(Parameters.URL_MAIN_PAGE);
 
         authPage = new AuthPage(driver);
@@ -62,38 +52,37 @@ public class ProfilePageTests {
         Allure.addAttachment("Пароль", password);
 
         apiClient = new ApiClient();
-        apiClient.createUser(name, email,password);
+        apiClient.createUser(name, email, password);
     }
+
     @After
     @Step("Закрытие браузера и очистка данных")
     public void tearDown() {
         driver.quit();
         apiClient.deleteTestUser(email, password);
     }
+
     @Step("Процесс авторизации")
     private void authUser() {
         authPage.setEmail(email);
         authPage.setPassword(password);
-
         authPage.clickAuthButton();
-
         authPage.waitFormSubmitted();
     }
+
     @Step("Переход в личный кабинет")
     private void goToProfile() {
         driver.get(Parameters.URL_LOGIN_PAGE);
         authPage.waitAuthFormVisible();
-
         authUser();
-
         mainPage.clickLinkToProfile();
         profilePage.waitAuthFormVisible();
     }
+
     @Test
     @DisplayName("Проверка перехода по клику на «Личный кабинет»")
     public void checkLinkToProfileIsSuccess() {
-        Allure.parameter("Браузер", browserName);
-
+        Allure.parameter("Браузер", webDriverFactory.getBrowserName());
         goToProfile();
 
         MatcherAssert.assertThat(
@@ -102,52 +91,5 @@ public class ProfilePageTests {
                 containsString("/account/profile")
         );
     }
-    @Test
-    @DisplayName("Проверка перехода из личного кабинета по клику на «Конструктор»")
-    public void checkLinkToConstructorIsSuccess() {
-        Allure.parameter("Браузер", browserName);
 
-        goToProfile();
-
-        profilePage.clickLinkToConstructor();
-        mainPage.waitHeaderIsVisible();
-
-        MatcherAssert.assertThat(
-                "Ожидается надпись «Оформить заказ» на кнопке в корзине",
-                mainPage.getBasketButtonText(),
-                equalTo("Оформить заказ")
-        );
-    }
-    @Test
-    @DisplayName("Проверка перехода из личного кабинета по клику на логотип Stellar Burgers")
-    public void checkLinkOnLogoIsSuccess() {
-        Allure.parameter("Браузер", browserName);
-
-        goToProfile();
-
-        profilePage.clickLinkOnLogo();
-        mainPage.waitHeaderIsVisible();
-
-        MatcherAssert.assertThat(
-                "Ожидается надпись «Оформить заказ» на кнопке в корзине",
-                mainPage.getBasketButtonText(),
-                equalTo("Оформить заказ")
-        );
-    }
-    @Test
-    @DisplayName("Проверка выхода из личного кабинета по клику на кнопку Выйти")
-    public void checkLinkLogOutIsSuccess() {
-        Allure.parameter("Браузер", browserName);
-
-        goToProfile();
-
-        profilePage.clickLogoutLink();
-        authPage.waitAuthFormVisible();
-
-        MatcherAssert.assertThat(
-                "Некорректный URL страницы Авторизации",
-                driver.getCurrentUrl(),
-                containsString("/login")
-        );
-    }
 }

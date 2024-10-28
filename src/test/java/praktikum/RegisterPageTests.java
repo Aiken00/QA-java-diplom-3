@@ -11,7 +11,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.runners.JUnit4;
 import org.openqa.selenium.WebDriver;
 import pageobjects.RegisterPage;
 
@@ -21,28 +21,18 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("Регистрация пользователя")
-@RunWith(Parameterized.class)
+@RunWith(JUnit4.class)
 public class RegisterPageTests {
     private WebDriver webDriver;
-    private String browserName;
     private RegisterPage registerPage;
     private String email, name, password;
+    private WebDriverFactory webDriverFactory;
 
-    @Parameterized.Parameters(name="Browser {0}")
-    public static Object[][] initParams() {
-        return new Object[][] {
-                {"chrome"},
-                {"yandex"}
-        };
-    }
-    public RegisterPageTests(String browserName) {
-        this.browserName = browserName;
-    }
     @Before
     @Step("Запуск браузера, подготовка тестовых данных")
     public void startUp() {
-        WebDriverFactory webDriverFactory = new WebDriverFactory();
-        webDriver = webDriverFactory.getWebDriver(browserName);
+        webDriverFactory = new WebDriverFactory();
+        webDriver = webDriverFactory.getWebDriver();
         webDriver.get(Parameters.URL_REGISTER_PAGE);
         registerPage = new RegisterPage(webDriver);
 
@@ -65,32 +55,24 @@ public class RegisterPageTests {
     @Test
     @DisplayName("Успешная регистрация")
     public void registerNewUserIsSuccess() {
-        Allure.parameter("Браузер", browserName);
-
+        Allure.parameter("Браузер", webDriverFactory.getBrowserName()); // Используем здесь
         registerPage.setEmail(email);
         registerPage.setName(name);
         registerPage.setPassword(password);
-
         registerPage.clickRegisterButton();
-
         registerPage.waitFormSubmitted("Вход");
-
         checkFormReload();
     }
 
     @Test
     @DisplayName("Регистрация с коротким паролем")
     public void registerNewUserLowPasswordIsFailed() {
-        Allure.parameter("Браузер", browserName);
-
+        Allure.parameter("Браузер", webDriverFactory.getBrowserName());
         registerPage.setEmail(email);
         registerPage.setName(name);
         registerPage.setPassword(password.substring(0, 3));
-
         registerPage.clickRegisterButton();
-
         registerPage.waitErrorIsVisible();
-
         checkErrorMessage();
     }
 
